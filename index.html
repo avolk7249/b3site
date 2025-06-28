@@ -48,7 +48,6 @@
 <script>
   const API_KEY = 'AIzaSyAMoGwN5pGvIH42UaKyaM984yIdY6a9xPA';
   const CHANNEL_ID = 'UC3GAkN1CvV7k7IZZLa7-neg';
-  const MAX_RESULTS = 10;
 
   const videoContainer = document.getElementById('videoContainer');
 
@@ -76,7 +75,7 @@
       const nonShorts = videoData.items.filter(video => {
         const durationSec = parseISODuration(video.contentDetails.duration);
         return durationSec >= 60; // exclude shorts (< 60 sec)
-      }).slice(0, 3); // show only top 3 non-shorts
+      }).slice(0, 4); // show only top 3 non-shorts
 
       videoContainer.innerHTML = '';
 
