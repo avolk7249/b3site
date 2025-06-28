@@ -97,8 +97,9 @@ section {
 video {
     border-radius: 15px;
     object-fit: cover;
-}   display: flex;
+    display: flex;
     gap: 1rem;
+    align-items: center;
     flex-wrap: wrap;
 }
 
@@ -113,6 +114,7 @@ video {
 .video-card {
     display: flex;
     flex: 1;
+    width: fit-content;
     min-width: 200px;
     background: var(--indigo);
     border-radius: 15px;
