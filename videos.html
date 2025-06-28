@@ -30,60 +30,26 @@
 </section>
 
 <script>
-  const API_KEY = 'AIzaSyAMoGwN5pGvIH42UaKyaM984yIdY6a9xPA';
-  const CHANNEL_ID = 'UC3GAkN1CvV7k7IZZLa7-neg';
-  const MAX_RESULTS = 50;
-  const CHUNK_SIZE = 8;
-
   const videoContainer = document.getElementById('videoContainer');
   const loadMoreBtn = document.getElementById('loadMoreBtn');
+  const CHUNK_SIZE = 8;
 
   let allVideos = [];
   let displayedCount = 0;
 
-  async function fetchAllVideos() {
-    let nextPageToken = '';
-    let allItems = [];
-
-    while (allItems.length < MAX_RESULTS) {
-      const res = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=25&pageToken=${nextPageToken}`);
-      const data = await res.json();
-      const items = data.items.filter(item => item.id.kind === "youtube#video");
-      allItems.push(...items);
-      if (!data.nextPageToken) break;
-      nextPageToken = data.nextPageToken;
-    }
-
-    return allItems;
-  }
-
-  async function loadVideos() {
+  async function loadVideosFromJSON() {
     try {
-      const searchItems = await fetchAllVideos();
-      const videoIds = searchItems.map(item => item.id.videoId).join(',');
+      const res = await fetch('videos.json');
+      const rawVideos = await res.json();
 
-      const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?key=${API_KEY}&id=${videoIds}&part=snippet,contentDetails`);
-      const videoData = await videoRes.json();
+      // ✅ Filter out videos shorter than 45 seconds
+      allVideos = rawVideos.filter(video => video.durationSeconds > 45);
 
-      function parseISODuration(iso) {
-        const regex = /PT(?:(\d+)M)?(?:(\d+)S)?/;
-        const match = iso.match(regex);
-        const minutes = parseInt(match[1] || 0, 10);
-        const seconds = parseInt(match[2] || 0, 10);
-        return (minutes * 60) + seconds;
-      }
-
-      allVideos = videoData.items.filter(video => {
-        const durationSec = parseISODuration(video.contentDetails.duration);
-        return durationSec >= 60;
-      });
-
-      videoContainer.innerHTML = ''; // Clear the "Loading..." text
+      videoContainer.innerHTML = '';
       loadNextChunk();
-
     } catch (error) {
       videoContainer.innerHTML = '<p>Failed to load videos.</p>';
-      console.error('YouTube API error:', error);
+      console.error('Error loading local video data:', error);
     }
   }
 
@@ -91,30 +57,25 @@
     const nextChunk = allVideos.slice(displayedCount, displayedCount + CHUNK_SIZE);
 
     nextChunk.forEach(video => {
-      const videoId = video.id;
-      const title = video.snippet.title;
-      const thumbnail = video.snippet.thumbnails.medium.url;
-
       const card = document.createElement('div');
       card.className = 'video-card';
       card.innerHTML = `
-        <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">
-          <img src="${thumbnail}" alt="${title}" />
-          <p>${title}</p>
+        <a href="https://www.youtube.com/watch?v=${video.id}" target="_blank">
+          <img src="${video.thumbnail}" alt="${video.title}" />
+          <p>${video.title}</p>
         </a>
       `;
       videoContainer.appendChild(card);
     });
 
     displayedCount += CHUNK_SIZE;
-
     if (displayedCount >= allVideos.length) {
       loadMoreBtn.style.display = 'none';
     }
   }
 
   loadMoreBtn.addEventListener('click', loadNextChunk);
-  loadVideos();
+  loadVideosFromJSON();
 </script>
   <footer>
     <p>&copy; Copyright B3 Studios, LLC. 2025. All rights reserved</p>
