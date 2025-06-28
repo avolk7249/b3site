@@ -23,24 +23,44 @@
   <div class="video-grid" id="videoContainer">
     <p>Loading videos...</p>
   </div>
+
+  <div class="load-more-wrapper">
+    <button id="loadMoreBtn">Load More</button>
+  </div>
 </section>
 
 <script>
   const API_KEY = 'AIzaSyAMoGwN5pGvIH42UaKyaM984yIdY6a9xPA';
   const CHANNEL_ID = 'UC3GAkN1CvV7k7IZZLa7-neg';
-  const MAX_RESULTS = 80;
+  const MAX_RESULTS = 50;
+  const CHUNK_SIZE = 8;
 
   const videoContainer = document.getElementById('videoContainer');
+  const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+  let allVideos = [];
+  let displayedCount = 0;
+
+  async function fetchAllVideos() {
+    let nextPageToken = '';
+    let allItems = [];
+
+    while (allItems.length < MAX_RESULTS) {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=25&pageToken=${nextPageToken}`);
+      const data = await res.json();
+      const items = data.items.filter(item => item.id.kind === "youtube#video");
+      allItems.push(...items);
+      if (!data.nextPageToken) break;
+      nextPageToken = data.nextPageToken;
+    }
+
+    return allItems;
+  }
 
   async function loadVideos() {
     try {
-      const searchRes = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=10`);
-      const searchData = await searchRes.json();
-
-      const videoIds = searchData.items
-        .filter(item => item.id.kind === "youtube#video")
-        .map(item => item.id.videoId)
-        .join(',');
+      const searchItems = await fetchAllVideos();
+      const videoIds = searchItems.map(item => item.id.videoId).join(',');
 
       const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?key=${API_KEY}&id=${videoIds}&part=snippet,contentDetails`);
       const videoData = await videoRes.json();
@@ -53,34 +73,47 @@
         return (minutes * 60) + seconds;
       }
 
-      const nonShorts = videoData.items.filter(video => {
+      allVideos = videoData.items.filter(video => {
         const durationSec = parseISODuration(video.contentDetails.duration);
-        return durationSec >= 60; // exclude shorts (< 60 sec)
-      }).slice(0, 40); // show only top 3 non-shorts
-
-      videoContainer.innerHTML = '';
-
-      nonShorts.forEach(video => {
-        const videoId = video.id;
-        const title = video.snippet.title;
-        const thumbnail = video.snippet.thumbnails.medium.url;
-
-        const card = document.createElement('div');
-        card.className = 'video-card';
-        card.innerHTML = `
-          <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">
-            <img src="${thumbnail}" alt="${title}" />
-            <p>${title}</p>
-          </a>
-        `;
-        videoContainer.appendChild(card);
+        return durationSec >= 60;
       });
+
+      videoContainer.innerHTML = ''; // Clear the "Loading..." text
+      loadNextChunk();
 
     } catch (error) {
       videoContainer.innerHTML = '<p>Failed to load videos.</p>';
       console.error('YouTube API error:', error);
     }
   }
+
+  function loadNextChunk() {
+    const nextChunk = allVideos.slice(displayedCount, displayedCount + CHUNK_SIZE);
+
+    nextChunk.forEach(video => {
+      const videoId = video.id;
+      const title = video.snippet.title;
+      const thumbnail = video.snippet.thumbnails.medium.url;
+
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      card.innerHTML = `
+        <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">
+          <img src="${thumbnail}" alt="${title}" />
+          <p>${title}</p>
+        </a>
+      `;
+      videoContainer.appendChild(card);
+    });
+
+    displayedCount += CHUNK_SIZE;
+
+    if (displayedCount >= allVideos.length) {
+      loadMoreBtn.style.display = 'none';
+    }
+  }
+
+  loadMoreBtn.addEventListener('click', loadNextChunk);
   loadVideos();
 </script>
   <footer>
