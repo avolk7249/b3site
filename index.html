@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>B3 Studios</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+  <div class="logo">
+    <img src="logo (1).png" alt="B3 Studios Logo">
+  </div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="videos.html">Videos</a>
+      <a href="contact.html">About Us/Contact</a>
+    </nav>
+  </header>
+
+  <section id="home">
+    <div class="home-layout">
+        <!-- LEFT: Video -->
+      <div class="home-video">
+        <video autoplay muted loop playsinline style="width: 100%; border-radius: 15px;">
+          <source src="logointro.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+        <div class="home-text">
+            <h2>Welcome to B3 Studios.</h2>
+            <p>Ezra and Miguel, two aspiring talented filmmakers who created such classics as "Miguel: The Movie", "Bonergeist", and other fables.</p>
+            <p>Although, they might be broke as shit, having to fork up a large part of their pay check for child support even though they should have the right to neglect their children, they still put in the time and effort to create art. Now that's true parenting. </p>
+            <p>Together, they make Youtube videos, short films, games, as well as cooking meth.</p>
+            <p>Delicious... delicious meth. Mmm... </p>
+        </div>
+    </div>
+  </section>
+
+<section id="videos">
+  <h2>Latest Videos</h2>
+  <div class="video-grid" id="videoContainer">
+    <p>Loading videos...</p>
+  </div>
+</section>
+
+<script>
+  const API_KEY = 'AIzaSyAMoGwN5pGvIH42UaKyaM984yIdY6a9xPA';
+  const CHANNEL_ID = 'UC3GAkN1CvV7k7IZZLa7-neg';
+  const MAX_RESULTS = 10;
+
+  const videoContainer = document.getElementById('videoContainer');
+
+  async function loadVideos() {
+    try {
+      const searchRes = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=10`);
+      const searchData = await searchRes.json();
+
+      const videoIds = searchData.items
+        .filter(item => item.id.kind === "youtube#video")
+        .map(item => item.id.videoId)
+        .join(',');
+
+      const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?key=${API_KEY}&id=${videoIds}&part=snippet,contentDetails`);
+      const videoData = await videoRes.json();
+
+      function parseISODuration(iso) {
+        const regex = /PT(?:(\d+)M)?(?:(\d+)S)?/;
+        const match = iso.match(regex);
+        const minutes = parseInt(match[1] || 0, 10);
+        const seconds = parseInt(match[2] || 0, 10);
+        return (minutes * 60) + seconds;
+      }
+
+      const nonShorts = videoData.items.filter(video => {
+        const durationSec = parseISODuration(video.contentDetails.duration);
+        return durationSec >= 60; // exclude shorts (< 60 sec)
+      }).slice(0, 3); // show only top 3 non-shorts
+
+      videoContainer.innerHTML = '';
+
+      nonShorts.forEach(video => {
+        const videoId = video.id;
+        const title = video.snippet.title;
+        const thumbnail = video.snippet.thumbnails.medium.url;
+
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.innerHTML = `
+          <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">
+            <img src="${thumbnail}" alt="${title}" />
+            <p>${title}</p>
+          </a>
+        `;
+        videoContainer.appendChild(card);
+      });
+
+    } catch (error) {
+      videoContainer.innerHTML = '<p>Failed to load videos.</p>';
+      console.error('YouTube API error:', error);
+    }
+  }
+  loadVideos();
+</script>
+
+  <footer>
+    <p>&copy; Copyright B3 Studios, LLC. 2025. All rights reserved.</p>
+  </footer>
+</body>
+</html>
