@@ -133,7 +133,6 @@ video {
     height: auto;
     border-radius: 10px;
     margin-bottom: 0.5rem;
-    transform: none;
 }
 .video-card p {
     font-size: 0.95rem;
@@ -151,7 +150,6 @@ video {
     justify-content: space-around;
     gap: 1rem;
     flex-wrap: wrap;
-    flex-direction: column;
     margin-top: 2rem;
 }
 
