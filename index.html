@@ -46,61 +46,40 @@
 </section>
 
 <script>
-  const API_KEY = 'AIzaSyAMoGwN5pGvIH42UaKyaM984yIdY6a9xPA';
-  const CHANNEL_ID = 'UC3GAkN1CvV7k7IZZLa7-neg';
-
   const videoContainer = document.getElementById('videoContainer');
+  const MAX_VIDEOS = 4;
 
-  async function loadVideos() {
+  async function loadVideosFromJSON() {
     try {
-      const searchRes = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=10`);
-      const searchData = await searchRes.json();
+      const res = await fetch('videos.json');
+      const rawVideos = await res.json();
 
-      const videoIds = searchData.items
-        .filter(item => item.id.kind === "youtube#video")
-        .map(item => item.id.videoId)
-        .join(',');
+      // Filter videos longer than 45 seconds
+      const filteredVideos = rawVideos.filter(video => video.durationSeconds > 45);
+      const limitedVideos = filteredVideos.slice(0, MAX_VIDEOS);
 
-      const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?key=${API_KEY}&id=${videoIds}&part=snippet,contentDetails`);
-      const videoData = await videoRes.json();
-
-      function parseISODuration(iso) {
-        const regex = /PT(?:(\d+)M)?(?:(\d+)S)?/;
-        const match = iso.match(regex);
-        const minutes = parseInt(match[1] || 0, 10);
-        const seconds = parseInt(match[2] || 0, 10);
-        return (minutes * 60) + seconds;
-      }
-
-      const nonShorts = videoData.items.filter(video => {
-        const durationSec = parseISODuration(video.contentDetails.duration);
-        return durationSec >= 60; // exclude shorts (< 60 sec)
-      }).slice(0, 4); // show only top 3 non-shorts
-
+      // Clear container before adding
       videoContainer.innerHTML = '';
 
-      nonShorts.forEach(video => {
-        const videoId = video.id;
-        const title = video.snippet.title;
-        const thumbnail = video.snippet.thumbnails.medium.url;
-
+      // Display up to 4 videos
+      limitedVideos.forEach(video => {
         const card = document.createElement('div');
         card.className = 'video-card';
         card.innerHTML = `
-          <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">
-            <img src="${thumbnail}" alt="${title}" />
-            <p>${title}</p>
+          <a href="https://www.youtube.com/watch?v=${video.id}" target="_blank">
+            <img src="${video.thumbnail}" alt="${video.title}" />
+            <p>${video.title}</p>
           </a>
         `;
         videoContainer.appendChild(card);
       });
-
     } catch (error) {
       videoContainer.innerHTML = '<p>Failed to load videos.</p>';
-      console.error('YouTube API error:', error);
+      console.error('Error loading local video data:', error);
     }
   }
-  loadVideos();
+
+  loadVideosFromJSON();
 </script>
 
   <footer>
