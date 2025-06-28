@@ -83,15 +83,25 @@ section {
     flex-wrap: wrap;
 }
 
+.split-layout {
+    flex-direction: column;
+}
+
 .home-video {
     flex: 1 1 50%;
     min-width: 300px;
 }
 
+.split-media,
+
 .home-text {
     flex: 1 1 45%;
     color: var(--text-secondary);
     text-align: right;
+}
+
+.split-text {
+    width: 100%;
 }
 
 video {
@@ -104,7 +114,7 @@ video {
 
 .video-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: 1fr;
     gap: 1.5rem;
     max-width: 600px;
     margin: 0 auto;
@@ -133,6 +143,7 @@ video {
     height: auto;
     border-radius: 10px;
     margin-bottom: 0.5rem;
+    transform: none;
 }
 .video-card p {
     font-size: 0.95rem;
@@ -150,6 +161,7 @@ video {
     justify-content: space-around;
     gap: 1rem;
     flex-wrap: wrap;
+    flex-direction: column;
     margin-top: 2rem;
 }
 
