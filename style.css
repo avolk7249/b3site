@@ -6,7 +6,7 @@
     --orange: #DE8548;
     --green: #68D07E;
     --yellow: #BFB692;
-    --indigo: #5967c2;
+    --indigo: #5265de;
     --text-primary: #000000;
     --text-secondary: #EDEDED;
 }
@@ -71,7 +71,7 @@ section {
     padding: 2rem;
     margin: 1rem auto;
     border-radius: 20px;
-    background: rgba(89, 103, 194, 0.7);
+    background: var(--indigo);
     backdrop-filter: blur(8px);
     max-width: 1100px;
 }
@@ -80,7 +80,7 @@ section {
 padding: 2rem;
 margin: 1rem auto;
 border-radius: 20px;
-background: rgba(89, 103, 194, 0.7);
+background: var(--indigo);
 text-align: center;
 backdrop-filter: blur(8px);
 max-width: 1100px;
@@ -108,7 +108,7 @@ max-width: 1100px;
     padding: 2rem;
     margin: 1rem auto;
     border-radius: 20px;
-    background: rgba(89, 103, 194, 0.7);
+    background: var(--indigo);
     backdrop-filter: blur(8px);
     max-width: 1100px;
 }
@@ -235,7 +235,7 @@ background-color: var(--blue-hover, #4575e2);
     padding: 2rem;
     margin: 1rem auto;
     border-radius: 20px;
-    background: rgba(89, 103, 194, 0.7);
+    background: var(--indigo);
     text-align: center;
     backdrop-filter: blur(8px);
     max-width: 1100px;
