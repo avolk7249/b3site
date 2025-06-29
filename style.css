@@ -19,7 +19,7 @@
 
 body {
     font-family: "Fira Sans", sans-serif;
-    background: linear-gradient(135deg,#3f2b96,#a751d8,#e75480);
+    background: linear-gradient(135deg,#5967c2,#7c51d8,#9054e7);
     background-size: 400% 400%;
     animation: gradientShift 20s ease infinite;
     color: var(--text-primary);
