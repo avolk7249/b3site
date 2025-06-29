@@ -1,4 +1,6 @@
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const path = require('path');
+const fs = require('fs');
 
 const API_KEY = 'AIzaSyDAaAhjAvzrtd-rfnQAfc5I1p1Z50Tv8t8';
 const CHANNEL_ID = 'UC3GAkN1CvV7k7IZZLa7-neg';
@@ -47,7 +49,10 @@ async function main() {
         };
     });
 
-    console.log(JSON.stringify(filtered, null, 2));
+    fs.writeFileSync(
+        path.resolve(__dirname, '../videos.json'),
+                     JSON.stringify(filtered, null, 2)
+    );
 }
 
 main();
