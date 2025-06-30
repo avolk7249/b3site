@@ -48,11 +48,18 @@
     <p>&copy; Copyright B3 Studios, LLC. 2025. All rights reserved.</p>
     </div>
   </footer>
+
 <script>
 const canvas = document.getElementById('bubbleCanvas');
 const ctx = canvas.getContext('2d');
 let bubbles = [];
 let bursts = [];
+
+let fastIntro = true;
+
+setTimeout(() => {
+  fastIntro = false;
+}, 2000);
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -67,7 +74,7 @@ function createBubble() {
     x: Math.random() * canvas.width,
     y: canvas.height + Math.random() * canvas.height / 2,
     radius: Math.random() * 8 + 2,
-    speed: Math.random() * 1.5 + 0.5,
+    speed: (fastIntro ? 5 : 1.5) + Math.random(),
     alpha: Math.random() * 0.5 + 0.3
   };
 }
@@ -89,6 +96,11 @@ function createBurst(x, y) {
     });
   }
   bursts.push(...burstParticles);
+}
+
+// 🚀 Massive intro burst
+for (let i = 0; i < 100; i++) {
+  bubbles.push(createBubble());
 }
 
 // Populate initial bubbles
