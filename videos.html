@@ -32,6 +32,59 @@
 </section>
 
 <script>
+  const videoContainer = document.getElementById('videoContainer');
+  const loadMoreBtn = document.getElementById('loadMoreBtn');
+  const CHUNK_SIZE = 12;
+
+  let allVideos = [];
+  let displayedCount = 0;
+
+  async function loadVideosFromJSON() {
+    try {
+      const res = await fetch('videos.json');
+      const rawVideos = await res.json();
+
+      // ✅ Filter out videos shorter than 45 seconds
+      allVideos = rawVideos.filter(video => video.durationSeconds > 45);
+
+      videoContainer.innerHTML = '';
+      loadNextChunk();
+    } catch (error) {
+      videoContainer.innerHTML = '<p>Failed to load videos.</p>';
+      console.error('Error loading local video data:', error);
+    }
+  }
+
+  function loadNextChunk() {
+    const nextChunk = allVideos.slice(displayedCount, displayedCount + CHUNK_SIZE);
+
+    nextChunk.forEach(video => {
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      card.innerHTML = `
+        <a href="https://www.youtube.com/watch?v=${video.id}" target="_blank">
+          <img src="${video.thumbnail}" alt="${video.title}" />
+          <p>${video.title}</p>
+        </a>
+      `;
+      videoContainer.appendChild(card);
+    });
+
+    displayedCount += CHUNK_SIZE;
+    if (displayedCount >= allVideos.length) {
+      loadMoreBtn.style.display = 'none';
+    }
+  }
+
+  loadMoreBtn.addEventListener('click', loadNextChunk);
+  loadVideosFromJSON();
+</script>
+  <footer>
+    <div class="footer-pill">
+    <p>&copy; Copyright B3 Studios, LLC. 2025. All rights reserved.</p>
+    </div>
+  </footer>
+<script>
 const canvas = document.getElementById('bubbleCanvas');
 const ctx = canvas.getContext('2d');
 let bubbles = [];
@@ -154,6 +207,5 @@ window.addEventListener('click', function(e) {
   });
 });
 </script>
-
 </body>
 </html>
