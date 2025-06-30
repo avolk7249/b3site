@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+<canvas id="bubbleCanvas"></canvas>
   <header>
   <div class="logo">
     <img src="logo (1).png" alt="B3 Studios Logo">
@@ -112,5 +113,117 @@
     <p>&copy; Copyright B3 Studios, LLC. 2025. All rights reserved.</p>
     </div>
   </footer>
+<script>
+const canvas = document.getElementById('bubbleCanvas');
+const ctx = canvas.getContext('2d');
+let bubbles = [];
+let bursts = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// Create a bubble object
+function createBubble() {
+  return {
+    x: Math.random() * canvas.width,
+    y: canvas.height + Math.random() * canvas.height / 2,
+    radius: Math.random() * 8 + 2,
+    speed: Math.random() * 1.5 + 0.5,
+    alpha: Math.random() * 0.5 + 0.3
+  };
+}
+
+// Create a burst particle
+function createBurst(x, y) {
+  const burstParticles = [];
+  const count = 8 + Math.floor(Math.random() * 6);
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * 2 * Math.PI;
+    const speed = Math.random() * 2 + 1;
+    burstParticles.push({
+      x,
+      y,
+      radius: Math.random() * 2 + 1,
+      alpha: 1,
+      dx: Math.cos(angle) * speed,
+      dy: Math.sin(angle) * speed
+    });
+  }
+  bursts.push(...burstParticles);
+}
+
+// Populate initial bubbles
+for (let i = 0; i < 60; i++) {
+  bubbles.push(createBubble());
+}
+
+// Animate the canvas
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Bubbles
+  bubbles.forEach((b, i) => {
+    b.y -= b.speed;
+    if (b.y + b.radius < 0) bubbles[i] = createBubble();
+
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${b.alpha})`;
+    ctx.fill();
+  });
+
+  // Bursts
+  bursts.forEach((p, i) => {
+    p.x += p.dx;
+    p.y += p.dy;
+    p.alpha -= 0.02;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+    ctx.fill();
+  });
+
+  // Remove faded burst particles
+  bursts = bursts.filter(p => p.alpha > 0);
+
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Scroll interaction
+let scrollBoost = 0;
+window.addEventListener('scroll', () => {
+  scrollBoost = 5;
+});
+
+setInterval(() => {
+  if (scrollBoost > 0) {
+    for (let i = 0; i < 5; i++) bubbles.push(createBubble());
+    scrollBoost--;
+  }
+}, 50);
+
+// Click interaction → pop & burst
+window.addEventListener('click', function(e) {
+  const rect = canvas.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const clickY = e.clientY - rect.top;
+
+  // Keep bubbles that weren't clicked
+  bubbles = bubbles.filter(b => {
+    const dist = Math.hypot(b.x - clickX, b.y - clickY);
+    const buffer = 10;
+    const wasHit = dist <= b.radius * 1.6;
+    if (wasHit) {
+      createBurst(b.x, b.y); // Create burst effect
+    }
+    return !wasHit;
+  });
+});
+</script>
 </body>
 </html>
