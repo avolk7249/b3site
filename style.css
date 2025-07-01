@@ -322,6 +322,8 @@ footer {
         background: rgba(82, 101, 222, 0.85);
         flex-direction: column;
         align-items: center;
+        box-sizing: border-box;
+        border-radius: 20px;
         margin: 2rem auto;
         padding: 2rem 1rem;
         width: 95%;
