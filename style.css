@@ -319,9 +319,11 @@ footer {
 /* === MOBILE LAYOUT OVERRIDES (<= 768px) === */
 @media (max-width: 768px) {
     header {
+        background: rgba(82, 101, 222, 0.85);
         flex-direction: column;
         align-items: center;
-        padding: 1rem;
+        margin: 2rem auto;
+        padding: 2rem 1rem;
         width: 95%;
     }
 
@@ -336,6 +338,31 @@ footer {
         display: block;
         width: 100%;
         text-align: center;
+    }
+
+    #bubbleCanvas {
+    width: 100vw;
+    height: 100vh;
+    pointer-events: auto;
+    z-index: -1;
+    }
+
+    /* Let background bubbles show through by making sections semi-transparent */
+    section,
+    #home,
+    #about,
+    #videos,
+    #video,
+    #music-s {
+    background: rgba(82, 101, 222, 0.85); /* semi-transparent indigo */
+    margin: 2rem auto; /* extra vertical space between sections */
+    padding: 2rem 1rem; /* tighter horizontal padding for side-space */
+    }
+
+    /* Add horizontal spacing so bubbles can float beside content */
+    body {
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
     .home-layout {
@@ -366,6 +393,7 @@ footer {
     .music-grid {
         grid-template-columns: 1fr;
         padding: 0 1rem;
+        gap: 2rem;
     }
 
     .member-card {
@@ -373,7 +401,9 @@ footer {
         max-width: 280px;
         margin: 0 auto;
     }
-
+    .music-card {
+        max-width: 90%;
+        margin: 0 auto;
     .footer-pill {
         font-size: 0.8rem;
         padding: 0.3rem 1rem;
