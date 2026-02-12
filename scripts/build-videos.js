@@ -2,7 +2,7 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 const path = require('path');
 const fs = require('fs');
 
-const API_KEY = 'AIzaSyDAaAhjAvzrtd-rfnQAfc5I1p1Z50Tv8t8';
+const API_KEY = 'AIzaSyAXOp5CL5s9iZ0JNOq0b-qq4XSkMqU9n2E';
 const CHANNEL_ID = 'UC3GAkN1CvV7k7IZZLa7-neg';
 
 async function main() {
