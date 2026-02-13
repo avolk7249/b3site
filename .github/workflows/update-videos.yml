@@ -3,7 +3,7 @@ name: Update Videos
 on:
   schedule:
     - cron: '0 0 * * 0'  # Every Sunday at 12:00 AM UTC
-  workflow_dispatch:     # Optional: allows manual triggering
+  workflow_dispatch:
 
 jobs:
   update:
@@ -11,17 +11,17 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
-
-      - name: Install node-fetch
-        run: npm install node-fetch
+          node-version: '20'
 
       - name: Run video fetch script
+        env:
+          YT_API_KEY: ${{ secrets.YT_API_KEY }}
+          YT_CHANNEL_ID: UC3GAkN1CvV7k7IZZLa7-neg
         run: node scripts/build-videos.js
 
       - name: Commit updated videos.json
