@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Prefer env var so GitHub Actions / local runs don't hardcode keys
-const API_KEY = process.env.YT_API_KEY || "AIzaSyAXOp5CL5s9iZ0JNOq0b-qq4XSkMqU9n2E";
+const API_KEY = process.env.YT_API_KEY || "AIzaSyAMoGwN5pGvIH42UaKyaM984yIdY6a9xPA";
 const CHANNEL_ID = process.env.YT_CHANNEL_ID || "UC3GAkN1CvV7k7IZZLa7-neg";
 
 const MIN_DURATION_SECONDS = 45; // change if you want
